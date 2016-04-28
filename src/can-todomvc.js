@@ -34,7 +34,14 @@ fixture("/servies/todos/{id}", todosStore)
 
 
 // Define model types
-Todo = DefineMap.extend({});
+Todo = DefineMap.extend({
+    define: {
+        id: "number",
+        name: "string",
+        completed: "boolean",
+        editing: "boolean"
+    }
+});
 
 Todo.List = DefineList.extend({
 	define: {
@@ -107,45 +114,44 @@ Component.extend({
 	}
 });
 
-Component.extend({
-	tag: "todos-app",
-	ViewModel: {
-		define: {
-			todosPromise: {
-				value: Todo.getList({})
-			},
-			todos: {
-				get: function(setVal, resolve) {
-					this.todosPromise.then(resolve)
-				}
-			},
-			displayedTodos: {
-				get: function() {
-					var filter = can.route.data.filter;
-					var todos = this.todos;
-					if (todos) {
-						if (filter == "active") {
-							return todos.remaining;
-						} else if (filter == "completed") {
-							return todos.completed;
-						} else {
-							return todos;
-						}
-					}
-				}
-			}
-		}
-	},
-	helpers: {
-		plural: function(word, num) {
-			var val = num();
-			return val == 1 ? word : word + "s";
-		}
-	},
-	leakScope: true
+var AppViewModel = DefineMap.extend({
+    define: {
+        todosPromise: {
+            value: Todo.getList({})
+        },
+        todos: {
+            get: function(setVal, resolve) {
+                this.todosPromise.then(resolve)
+            }
+        },
+        displayedTodos: {
+            get: function() {
+                var filter = this.filter;
+                var todos = this.todos;
+                if (todos) {
+                    if (filter == "active") {
+                        return todos.remaining;
+                    } else if (filter == "completed") {
+                        return todos.completed;
+                    } else {
+                        return todos;
+                    }
+                }
+            }
+        }
+    }
 });
+
+stache.registerHelper("plural", function(word, num) {
+    var val = num();
+    return val == 1 ? word : word + "s";
+});
+
+var appViewModel = new AppViewModel();
+
+route.map(appViewModel)
 
 route.ready();
 
 
-$("#app").append(appStache());
+$("#app").append(appStache(appViewModel));
