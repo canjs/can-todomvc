@@ -120,6 +120,7 @@ Component.extend({
 	}
 });
 
+// Create the application view model
 var AppViewModel = DefineMap.extend({
     define: {
         todosPromise: {
@@ -148,16 +149,16 @@ var AppViewModel = DefineMap.extend({
     }
 });
 
+var appViewModel = new AppViewModel();
+
+// connect it to the route
+route.map(appViewModel)
+route.ready();
+
 stache.registerHelper("plural", function(word, num) {
     var val = num();
     return val == 1 ? word : word + "s";
 });
 
-var appViewModel = new AppViewModel();
-
-route.map(appViewModel)
-
-route.ready();
-
-
+// render the template with the app view model
 $("#app").append(appStache(appViewModel));
