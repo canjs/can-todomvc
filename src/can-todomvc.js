@@ -102,15 +102,15 @@ Component.extend({
 	tag: "todos-list",
 	view: listStache,
 	ViewModel: {
-        todos: Todo.List
-		edit: function(todo) {
-			todo.editing = true;
-		},
-		updateTodo: function(todo, newName) {
-			todo.name = newName;
-			todo.editing = false;
-			todo.save();
-		}
+        todos: Todo.List,
+        edit: function(todo) {
+        	todo.editing = true;
+        },
+        updateTodo: function(todo, newName) {
+        	todo.name = newName;
+        	todo.editing = false;
+        	todo.save();
+        }
 	}
 });
 
