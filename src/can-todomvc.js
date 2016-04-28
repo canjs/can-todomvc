@@ -35,34 +35,32 @@ fixture("/servies/todos/{id}", todosStore)
 
 // Define model types
 Todo = DefineMap.extend({
-    define: {
-        id: "number",
-        name: "string",
-        completed: "boolean",
-        editing: "boolean"
-    }
+    id: "number",
+    name: "string",
+    completed: "boolean",
+    editing: "boolean"
 });
 
 Todo.List = DefineList.extend({
-	define: {
-		"*": {
-			Type: Todo
-		},
-		remaining: {
-			get: function() {
-				return this.filter({
-					completed: true
-				});
-			}
-		},
-		completed: {
-			get: function() {
-				return this.filter({
-					completed: false
-				});
-			}
+
+	"*": {
+		Type: Todo
+	},
+	remaining: {
+		get: function() {
+			return this.filter({
+				completed: true
+			});
 		}
 	},
+	completed: {
+		get: function() {
+			return this.filter({
+				completed: false
+			});
+		}
+	},
+
 	destroyCompleted: function() {
 		this.completed.forEach(function(todo) {
 			todo.destroy()
@@ -88,9 +86,7 @@ Component.extend({
 	tag: "todos-create",
 	view: createStache,
 	ViewModel: {
-        define: {
-            name: "string"
-        },
+        name: "string"
 		createTodo: function() {
 			new Todo({
 				name: this.name,
@@ -106,9 +102,7 @@ Component.extend({
 	tag: "todos-list",
 	view: listStache,
 	ViewModel: {
-        define: {
-            todos: {Type: Todo.List}
-        },
+        todos: Todo.List
 		edit: function(todo) {
 			todo.editing = true;
 		},
@@ -122,31 +116,30 @@ Component.extend({
 
 // Create the application view model
 var AppViewModel = DefineMap.extend({
-    define: {
-        todosPromise: {
-            value: Todo.getList({})
-        },
-        todos: {
-            get: function(setVal, resolve) {
-                this.todosPromise.then(resolve)
-            }
-        },
-        displayedTodos: {
-            get: function() {
-                var filter = this.filter;
-                var todos = this.todos;
-                if (todos) {
-                    if (filter == "active") {
-                        return todos.remaining;
-                    } else if (filter == "completed") {
-                        return todos.completed;
-                    } else {
-                        return todos;
-                    }
+    todosPromise: {
+        value: Todo.getList.bind(Todo,{})
+    },
+    todos: {
+        get: function(setVal, resolve) {
+            this.todosPromise.then(resolve)
+        }
+    },
+    displayedTodos: {
+        get: function() {
+            var filter = this.filter;
+            var todos = this.todos;
+            if (todos) {
+                if (filter == "active") {
+                    return todos.remaining;
+                } else if (filter == "completed") {
+                    return todos.completed;
+                } else {
+                    return todos;
                 }
             }
         }
     }
+
 });
 
 var appViewModel = new AppViewModel();
