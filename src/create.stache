@@ -1,0 +1,5 @@
+<input id="new-todo"
+    {(value)}="name"
+	($enter)="createTodo()"
+	placeholder="What needs to be done?"
+	autofocus=""/>

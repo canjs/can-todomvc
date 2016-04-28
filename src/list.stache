@@ -1,0 +1,19 @@
+{{#each todos}}
+	<li class="todo {{#completed}}completed{{/completed}} {{#editing}}editing{{/editing}}"
+		($dblclick)='edit(.)'>
+		<div class="view">
+			<input
+				class="toggle"
+				type="checkbox"
+				{($checked})='completed'/>
+			<label>{{name}}</label>
+			<button class="destroy"
+					($click)="destroy()"></button>
+		</div>
+		<input class="edit"
+			   type="text"
+			   {value}="name"
+			   ($blur)='updateTodo(.,%element.value)'
+			   ($enter)='updateTodo(.%element.value)'>
+	</li>
+{{/each}}

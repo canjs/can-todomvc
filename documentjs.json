@@ -1,0 +1,14 @@
+{
+  "sites": {
+    "docs": {
+      "dest": "docs",
+      "parent": "can-todomvc",
+      "pageConfig": {
+        "page": "docs"
+      },
+      "glob": {
+        "pattern": "src/**/*.{js,md}"
+      }
+    }
+  }
+}
