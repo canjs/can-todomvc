@@ -88,6 +88,9 @@ Component.extend({
 	tag: "todos-create",
 	view: createStache,
 	ViewModel: {
+        define: {
+            name: "string"
+        },
 		createTodo: function() {
 			new Todo({
 				name: this.name,
@@ -103,6 +106,9 @@ Component.extend({
 	tag: "todos-list",
 	view: listStache,
 	ViewModel: {
+        define: {
+            todos: {Type: Todo.List}
+        },
 		edit: function(todo) {
 			todo.editing = true;
 		},
