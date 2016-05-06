@@ -42,7 +42,7 @@
     "donejs"
   ],
   "system": {
-    "main": "can-todomvc",
+    "main": "src/can-todomvc",
     "configDependencies": [
       "live-reload"
     ],
@@ -56,24 +56,20 @@
     "npmAlgorithm": "flat"
   },
   "dependencies": {
-    "can-component": "^3.0.0-pre.1",
-    "can-define": "^0.5.0",
-    "can-route": "^0.3.0",
+    "can-component": "^3.0.0-pre.2",
+    "can-connect": "^0.6.0-pre.4",
+    "can-define": "^0.6.0",
+    "can-fixture": "^0.4.0-pre.1",
+    "can-set": "^0.6.0-pre.3",
     "can-stache": "^3.0.0-pre.1",
-
-    "can-connect": "^0.5.5",
-    "can-fixture": "^0.3.0"
+    "steal-stache": "^3.0.0-pre.1"
   },
   "devDependencies": {
-    "documentjs": "^0.4.2",
     "jshint": "^2.9.1",
     "cssify": "^0.6.0",
     "steal": "^0.16.0",
     "steal-qunit": "^0.1.1",
     "steal-tools": "^0.16.0",
-    "testee": "^0.2.4",
-    "generator-donejs": "^0.9.0",
-    "donejs-cli": "^0.8.0",
-    "done-serve": "^0.2.0"
+    "testee": "^0.2.4"
   }
 }

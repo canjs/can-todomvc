@@ -1,13 +1,16 @@
+"use strict";
 var fixture = require("can-fixture");
 var Component = require("can-component");
 var DefineMap = require("can-define/map/map");
 var DefineList = require("can-define/list/list");
 var superMap = require("can-connect/can/super-map/super-map");
-var route = require("can-route");
+var stache = require("can-stache");
 
 var appStache = require("./app.stache");
 var listStache = require("./list.stache");
 var createStache = require("./create.stache");
+
+require("./base.css");
 
 // Algebra used to define the service we connect to.
 // Used by fixture and by connection.
@@ -28,39 +31,37 @@ var todosStore = fixture.store([{
 	id: 2,
 	name: "pick up laundry",
 	completed: true
-}], todoServiceAlgebra);
+}], todoAlgebra);
 
-fixture("/servies/todos/{id}", todosStore)
+fixture("/services/todos/{id}", todosStore);
 
 
 // Define model types
-Todo = DefineMap.extend({
+var Todo = DefineMap.extend({
 	id: "number",
 	name: "string",
 	completed: "boolean",
 	editing: "boolean"
 });
 
+
 Todo.List = DefineList.extend({
 
-	"*": {
-		Type: Todo
-	},
+	"*": Todo,
 	remaining: {
-		get: function() {
-			return this.filter({
-				completed: true
-			});
-		}
-	},
-	completed: {
 		get: function() {
 			return this.filter({
 				completed: false
 			});
 		}
 	},
-
+	completed: {
+		get: function() {
+			return this.filter({
+				completed: true
+			});
+		}
+	},
 	destroyCompleted: function() {
 		this.completed.forEach(function(todo) {
 			todo.destroy()
@@ -68,50 +69,54 @@ Todo.List = DefineList.extend({
 	},
 	setCompletedTo: function(value) {
 		this.forEach(function(todo) {
-			todo.complete = value;
+			todo.completed = value;
 		});
 	}
 });
 
 // Wire types up to URL
 superMap({
-	url: "/servies/todos/{id}",
+	url: "/services/todos",
 	Map: Todo,
 	List: Todo.List,
-	algebra: todoAlgebra
+	algebra: todoAlgebra,
+	name: "todos"
+});
+
+var TodosCreateVM = DefineMap.extend({
+	name: "string",
+	createTodo: function() {
+		new Todo({
+			name: this.name,
+			completed: false
+		}).save();
+		this.name = "";
+	}
 });
 
 // Creates todos
 Component.extend({
 	tag: "todos-create",
-	view: createStache,
-	ViewModel: {
-		name: "string"
-		createTodo: function() {
-			new Todo({
-				name: this.name,
-				completed: false
-			}).save();
-			this.name = "";
-		}
-	}
+	template: createStache,
+	ViewModel: TodosCreateVM
 });
 
+var TodosListVM = DefineMap.extend({
+	todos: Todo.List,
+	edit: function(todo) {
+		todo.editing = true;
+	},
+	updateTodo: function(todo, newName) {
+		todo.name = newName;
+		todo.editing = false;
+		todo.save();
+	}
+});
 // Lists todos and
 Component.extend({
 	tag: "todos-list",
-	view: listStache,
-	ViewModel: {
-		todos: Todo.List,
-		edit: function(todo) {
-			todo.editing = true;
-		},
-		updateTodo: function(todo, newName) {
-			todo.name = newName;
-			todo.editing = false;
-			todo.save();
-		}
-	}
+	template: listStache,
+	ViewModel: TodosListVM
 });
 
 // Create the application view model
@@ -121,7 +126,11 @@ var AppViewModel = DefineMap.extend({
 	},
 	todos: {
 		get: function(setVal, resolve) {
-			this.todosPromise.then(resolve)
+			this.todosPromise.then(resolve, function(e){
+				setTimeout(function(){
+					throw e;
+				},1)
+			})
 		}
 	},
 	displayedTodos: {
@@ -145,8 +154,8 @@ var AppViewModel = DefineMap.extend({
 var appViewModel = new AppViewModel();
 
 // connect it to the route
-route.map(appViewModel)
-route.ready();
+/*route.map(appViewModel)
+route.ready();*/
 
 stache.registerHelper("plural", function(word, num) {
 	var val = num();
@@ -154,4 +163,4 @@ stache.registerHelper("plural", function(word, num) {
 });
 
 // render the template with the app view model
-$("#app").append(appStache(appViewModel));
+$(document.body).append(appStache(appViewModel));
