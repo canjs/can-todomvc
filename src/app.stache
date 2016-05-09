@@ -11,12 +11,15 @@
 	</section>
 	<footer id="footer" class="">
 		<span id="todo-count">
-			<strong>{{todos.remaining.length}}</strong> {{plural "item" todos.remaining.length}} left
+			<strong>{{todos.remaining.length}}</strong> {{plural("item",todos.remaining.length)}} left
 		</span>
 		<ul id="filters">
-			<li><a href="{{routeUrl filter=undefined}}">All</a></li>
-			<li><a href="{{routeUrl filter='active'}}">Active</a></li>
-			<li><a href="{{routeUrl filter='completed'}}">Completed</a></li>
+			<li><a {{#routeCurrent}}class='selected'{{/routeCurrent}}
+					href="{{routeUrl filter=undefined}}">All</a></li>
+			<li><a {{#routeCurrent filter='active'}}class='selected'{{/routeCurrent}}
+					href="{{routeUrl filter='active'}}">Active</a></li>
+			<li><a {{#routeCurrent filter='completed'}}class='selected'{{/routeCurrent}}
+					href="{{routeUrl filter='completed'}}">Completed</a></li>
 		</ul>
 		<button id="clear-completed"
 				class="{{^todos.completed.length}}hidden{{/todos.completed.length}}"

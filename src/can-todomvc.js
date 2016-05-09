@@ -5,17 +5,20 @@ var DefineMap = require("can-define/map/map");
 var DefineList = require("can-define/list/list");
 var superMap = require("can-connect/can/super-map/super-map");
 var stache = require("can-stache");
-
+var route = require("can-route");
 var appStache = require("./app.stache");
 var listStache = require("./list.stache");
 var createStache = require("./create.stache");
+
+require("can-stache/helpers/route");
 
 require("./base.css");
 
 // Algebra used to define the service we connect to.
 // Used by fixture and by connection.
 var todoAlgebra = new set.Algebra(
-	set.comparators.id("id")
+	set.comparators.id("id"),
+	set.comparators.boolean("completed")
 );
 
 // Create fake data and service.
@@ -34,7 +37,7 @@ var todosStore = fixture.store([{
 }], todoAlgebra);
 
 fixture("/services/todos/{id}", todosStore);
-
+fixture.delay = 5000;
 
 // Define model types
 var Todo = DefineMap.extend({
@@ -121,31 +124,33 @@ Component.extend({
 
 // Create the application view model
 var AppViewModel = DefineMap.extend({
+	"*": {
+		serialize: false
+	},
+	filter: {
+		serialize: true,
+		type: "string"
+	},
+	route: "string",
 	todosPromise: {
-		value: Todo.getList.bind(Todo, {})
+		value: Todo.getList.bind(Todo, {completed: false})
 	},
 	todos: {
 		get: function(setVal, resolve) {
-			this.todosPromise.then(resolve, function(e){
-				setTimeout(function(){
-					throw e;
-				},1)
-			})
+			var filter = this.filter;
+			if(filter === "active") {
+				Todo.getList({completed: false}).then(resolve)
+			} else if(filter === "completed") {
+				Todo.getList({completed: true}).then(resolve)
+			} else {
+				Todo.getList({}).then(resolve)
+			}
 		}
 	},
 	displayedTodos: {
 		get: function() {
-			var filter = this.filter;
-			var todos = this.todos;
-			if (todos) {
-				if (filter == "active") {
-					return todos.remaining;
-				} else if (filter == "completed") {
-					return todos.completed;
-				} else {
-					return todos;
-				}
-			}
+			console.log("updated")
+			return this.todos;
 		}
 	}
 
@@ -154,12 +159,13 @@ var AppViewModel = DefineMap.extend({
 var appViewModel = new AppViewModel();
 
 // connect it to the route
-/*route.map(appViewModel)
-route.ready();*/
+route.map(appViewModel);
+route(":filter");
+route.ready();
+window.appViewModel = appViewModel;
 
 stache.registerHelper("plural", function(word, num) {
-	var val = num();
-	return val == 1 ? word : word + "s";
+	return num == 1 ? word : word + "s";
 });
 
 // render the template with the app view model
