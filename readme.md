@@ -1,5 +1,7 @@
 # can-todomvc
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-todomvc.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/canjs/can-todomvc.png?branch=master)](https://travis-ci.org/canjs/can-todomvc)
 
 TodoMVC with CanJS 3.0
